@@ -11,15 +11,15 @@ public class CreateTransactionRequestDTO {
 
     @Min(value = 0, message = "minimum amount is zero")
     @JsonProperty("amount")
-    private Double amount;
+    private final Double amount;
 
     @NotNull(message = "transaction type invalid")
     @ValueOfEnum(enumClass = TransactionType.class)
     @JsonProperty("type")
-    private String type;
+    private final String type;
 
     @JsonProperty("parent_id")
-    private Long parentId;
+    private final Long parentId;
 
 
     public CreateTransactionRequestDTO(Double amount, String type, Long parentId) {
