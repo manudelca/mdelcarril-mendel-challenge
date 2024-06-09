@@ -4,6 +4,7 @@ import com.mendel.challenge.dto.service.TransactionDTO;
 import com.mendel.challenge.dto.service.exception.ParentTransactionIdEqualsTransactionIdException;
 import com.mendel.challenge.dto.service.exception.ParentTransactionNotFoundException;
 import com.mendel.challenge.model.Transaction;
+import com.mendel.challenge.repository.TransactionRepository;
 import com.mendel.challenge.repository.TransactionRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,10 @@ import java.util.Objects;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    private final TransactionRepositoryImpl transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     @Autowired
-    public TransactionServiceImpl(TransactionRepositoryImpl transactionRepository) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
 

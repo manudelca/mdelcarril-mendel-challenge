@@ -1,6 +1,9 @@
 package com.mendel.challenge.dto.service;
 
+import com.mendel.challenge.model.Transaction;
 import com.mendel.challenge.model.enums.TransactionType;
+
+import java.util.Objects;
 
 public class TransactionDTO {
     private final Long id;
@@ -26,5 +29,16 @@ public class TransactionDTO {
     }
     public Long getParentId() {
         return parentId;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null)
+            return false;
+        if (getClass() != o.getClass())
+            return false;
+        TransactionDTO transaction = (TransactionDTO) o;
+        return Objects.equals(id, transaction.id) && Objects.equals(amount, transaction.amount) && Objects.equals(type, transaction.type) && Objects.equals(parentId, transaction.parentId);
     }
 }

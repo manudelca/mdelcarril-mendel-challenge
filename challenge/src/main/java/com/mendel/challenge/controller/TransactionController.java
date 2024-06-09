@@ -3,7 +3,7 @@ package com.mendel.challenge.controller;
 import com.mendel.challenge.dto.controller.CreateTransactionRequestDTO;
 import com.mendel.challenge.dto.controller.CreateTransactionResponseDTO;
 import com.mendel.challenge.model.enums.TransactionType;
-import com.mendel.challenge.service.TransactionServiceImpl;
+import com.mendel.challenge.service.TransactionService;
 import com.mendel.challenge.dto.service.TransactionDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TransactionController {
 
-    private final TransactionServiceImpl transactionService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public TransactionController(TransactionServiceImpl transactionService) {
+    public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 
