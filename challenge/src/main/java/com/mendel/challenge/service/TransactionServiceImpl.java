@@ -4,8 +4,10 @@ import com.mendel.challenge.dto.service.TransactionDTO;
 import com.mendel.challenge.dto.service.exception.ParentTransactionIdEqualsTransactionIdException;
 import com.mendel.challenge.dto.service.exception.ParentTransactionNotFoundException;
 import com.mendel.challenge.model.Transaction;
+import com.mendel.challenge.model.enums.TransactionType;
 import com.mendel.challenge.repository.TransactionRepository;
 import com.mendel.challenge.repository.TransactionRepositoryImpl;
+import com.mendel.challenge.util.PagedResultsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,5 +44,10 @@ public class TransactionServiceImpl implements TransactionService {
                 saveResp.getAmount(),
                 saveResp.getType(),
                 saveResp.getParentId());
+    }
+
+    @Override
+    public PagedResultsDTO<Long> GetTransactionIDsByType(TransactionType transactionType, int offset, int limit) {
+        return this.transactionRepository.GetTransactionIDsByType(transactionType, offset, limit);
     }
 }

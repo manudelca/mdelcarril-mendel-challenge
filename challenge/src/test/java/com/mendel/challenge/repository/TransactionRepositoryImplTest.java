@@ -2,11 +2,15 @@ package com.mendel.challenge.repository;
 
 import com.mendel.challenge.model.Transaction;
 import com.mendel.challenge.model.enums.TransactionType;
+import com.mendel.challenge.util.PagedResultsDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -100,6 +104,42 @@ public class TransactionRepositoryImplTest {
         assertEquals(transaction, savedTransaction);
         assertNotNull(savedTransaction.getParentId());
         assertEquals(transaction, transactionRepository.GetTransaction(2L));
+    }
+
+
+    @Test
+    void testGetTransactionByIDNoTransactions() {
+        // When
+        PagedResultsDTO<Long> result = transactionRepository.GetTransactionIDsByType(TransactionType.CARS, 0, 10);
+
+        // Then
+        assertEquals(0, result.getPage().getOffset());
+        assertEquals(0, result.getPage().getTotal());
+        assertEquals(10, result.getPage().getLimit());
+        assertEquals(0, result.getResult().size());
+    }
+
+    @Test
+    void testGetTransactionByIDWithTransactions() {
+        // Given
+        Transaction transaction = new Transaction(
+                1L,
+                10.0,
+                TransactionType.CARS,
+                null);
+
+        Transaction savedTransaction = transactionRepository.SaveTransaction(transaction);
+        assertNotNull(savedTransaction);
+
+        // When
+        PagedResultsDTO<Long> result = transactionRepository.GetTransactionIDsByType(TransactionType.CARS, 0, 10);
+
+        // Then
+        assertEquals(0, result.getPage().getOffset());
+        assertEquals(1, result.getPage().getTotal());
+        assertEquals(10, result.getPage().getLimit());
+        assertEquals(1, result.getResult().size());
+        assertEquals(1, result.getResult().getFirst());
     }
 
 }
