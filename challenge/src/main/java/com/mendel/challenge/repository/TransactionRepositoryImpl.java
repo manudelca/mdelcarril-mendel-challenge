@@ -12,15 +12,17 @@ import java.util.stream.Collectors;
 public class TransactionRepositoryImpl implements TransactionRepository {
 
     private final Map<Long, Transaction> transactions;
-
     // El siguiente mapa vendría a representar a un índice en una base de datos.
     // Jamas guardaria un listado de IDs asociado a un Enum.
     private final Map<TransactionType, Set<Long>> typeIndex;
 
+    // Almacenamiento aparte para almacenar la suma total de las transacciones
+    private final Map<Long, Double> transacitonsSum;
 
     public TransactionRepositoryImpl() {
         transactions = new HashMap<>();
         typeIndex = new HashMap<>();
+        transacitonsSum = new HashMap<>();
     }
 
     @Override
@@ -33,6 +35,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         transactions.put(transaction.getId(), transaction);
         typeIndex.computeIfAbsent(transaction.getType(), _ -> new HashSet<>());
         typeIndex.get(transaction.getType()).add(transaction.getId());
+        this.transacitonsSum.put(transaction.getId(), transaction.getAmount());
         return transaction;
     }
 
@@ -44,5 +47,16 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .limit(limit)
                 .toList();
         return new PagedResultsDTO<Long>(offset, limit, total, values);
+    }
+
+    @Override
+    public void AddTransactionSum(Long id, Double amount) {
+        transacitonsSum.computeIfAbsent(id, _ -> 0.0);
+        transacitonsSum.compute(id, (k, currentSum) -> currentSum + amount);
+    }
+
+    @Override
+    public Double GetTransactionSum(Long id) {
+        return transacitonsSum.get(id);
     }
 }

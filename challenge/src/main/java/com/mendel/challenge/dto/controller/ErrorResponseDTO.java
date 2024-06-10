@@ -1,12 +1,19 @@
 package com.mendel.challenge.dto.controller;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class ErrorResponseDTO {
+
+    @JsonProperty("status")
     private final Integer status;
+    @JsonProperty("error")
     private final String error;
+    @JsonProperty("message")
     private final String message;
+    @JsonProperty("causes")
     private final List<String> causes;
 
 

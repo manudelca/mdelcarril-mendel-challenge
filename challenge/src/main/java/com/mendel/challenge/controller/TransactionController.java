@@ -2,6 +2,7 @@ package com.mendel.challenge.controller;
 
 import com.mendel.challenge.dto.controller.CreateTransactionRequestDTO;
 import com.mendel.challenge.dto.controller.CreateTransactionResponseDTO;
+import com.mendel.challenge.dto.controller.GetTransactionSumResponseDTO;
 import com.mendel.challenge.model.enums.TransactionType;
 import com.mendel.challenge.service.TransactionService;
 import com.mendel.challenge.dto.service.TransactionDTO;
@@ -41,5 +42,10 @@ public class TransactionController {
                                     @Valid @NotNull @Min(value = 0) @RequestParam int offset,
                                     @Valid @NotNull @Max(value = 50) @RequestParam int limit) {
         return this.transactionService.GetTransactionIDsByType(TransactionType.valueOf(transactionType.toUpperCase()), offset, limit);
+    }
+
+    @GetMapping("/transactions/sum/{transactionId}")
+    public GetTransactionSumResponseDTO GetTransactionSum(@Valid @NotNull @PathVariable("transactionId") Long transactionId) {
+        return new GetTransactionSumResponseDTO(this.transactionService.GetTransactionSum(transactionId));
     }
 }

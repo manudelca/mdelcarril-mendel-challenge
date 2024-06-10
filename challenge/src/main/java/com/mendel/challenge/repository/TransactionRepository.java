@@ -9,4 +9,6 @@ public interface TransactionRepository {
     Transaction GetTransaction(Long id);
     Transaction SaveTransaction(Transaction transaction);
     PagedResultsDTO<Long> GetTransactionIDsByType(TransactionType transactionType, int offset, int limit);
+    void AddTransactionSum(Long id, Double amount);
+    Double GetTransactionSum(Long id);
 }

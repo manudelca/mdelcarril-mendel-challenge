@@ -18,6 +18,17 @@ public class TransactionDTO {
         this.parentId = parentId;
     }
 
+    public TransactionDTO(Transaction transaction) {
+        this.id = transaction.getId();
+        this.amount = transaction.getAmount();
+        this.type = transaction.getType();
+        this.parentId = transaction.getParentId();
+    }
+
+    public Transaction buildTransactionFromDTO() {
+        return new Transaction(id, amount, type, parentId);
+    }
+
     public Long getId() {
         return id;
     }

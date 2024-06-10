@@ -8,4 +8,6 @@ public interface TransactionService {
 
     TransactionDTO CreateTransaction(TransactionDTO transactionRequest);
     PagedResultsDTO<Long> GetTransactionIDsByType(TransactionType transactionType, int offset, int limit);
+    void UpdateTransactionSum(Long id, Double sumDiff);
+    Double GetTransactionSum(Long id);
 }
