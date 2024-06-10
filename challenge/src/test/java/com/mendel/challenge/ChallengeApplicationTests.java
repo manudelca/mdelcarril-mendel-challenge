@@ -14,15 +14,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ChallengeApplicationTests {
 
 	@Autowired
@@ -256,5 +254,220 @@ class ChallengeApplicationTests {
 				.andExpect(status().isBadRequest())
 				.andReturn();
 	}
+
+
+	@Test
+	@DirtiesContext
+	public void testGetTransactionSumSuccess() throws Exception {
+		// Given Transaction
+		CreateTransactionRequestDTO transactionRequestDTO = new CreateTransactionRequestDTO(100.0, "CARS", null);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/1")
+						.content(objectMapper.writeValueAsString(transactionRequestDTO))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").isEmpty())
+				.andReturn();
+
+		// When - Then
+		mockMvc.perform(MockMvcRequestBuilders.get("/transactions/sum/1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.sum").value(100))
+				.andReturn();
+	}
+
+
+	@Test
+	@DirtiesContext
+	public void testCreateTransactionWithChildID() throws Exception {
+		// Given Parent Transaction
+		CreateTransactionRequestDTO parentTransactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", null);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/1")
+						.content(objectMapper.writeValueAsString(parentTransactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").isEmpty())
+				.andReturn();
+
+		// Given Child
+		CreateTransactionRequestDTO transactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", 1L);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/2")
+						.content(objectMapper.writeValueAsString(transactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(2))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").value(1))
+				.andReturn();
+
+		// When - Then
+		mockMvc.perform(MockMvcRequestBuilders.get("/transactions/sum/1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.sum").value(200))
+				.andReturn();
+
+	}
+
+
+	@Test
+	@DirtiesContext
+	public void testCreateTransactionWithMultipleChild() throws Exception {
+		// Given Parent Transaction
+		CreateTransactionRequestDTO parentTransactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", null);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/1")
+						.content(objectMapper.writeValueAsString(parentTransactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").isEmpty())
+				.andReturn();
+
+		// Given Child
+		CreateTransactionRequestDTO transactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", 1L);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/2")
+						.content(objectMapper.writeValueAsString(transactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(2))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").value(1))
+				.andReturn();
+
+		// Given Second Child
+		CreateTransactionRequestDTO transactionSecondRequest = new CreateTransactionRequestDTO(100.0, "CARS", 1L);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/3")
+						.content(objectMapper.writeValueAsString(transactionSecondRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(3))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").value(1))
+				.andReturn();
+
+		// When - Then
+		mockMvc.perform(MockMvcRequestBuilders.get("/transactions/sum/1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.sum").value(300))
+				.andReturn();
+
+	}
+
+
+	@Test
+	@DirtiesContext
+	public void testCreateTransactionWithAmountChange() throws Exception {
+		// Given Parent Transaction
+		CreateTransactionRequestDTO parentTransactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", null);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/1")
+						.content(objectMapper.writeValueAsString(parentTransactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").isEmpty())
+				.andReturn();
+
+		// Given Child
+		CreateTransactionRequestDTO transactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", 1L);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/2")
+						.content(objectMapper.writeValueAsString(transactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(2))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").value(1))
+				.andReturn();
+
+		// Given Child update
+		CreateTransactionRequestDTO transactionSecondRequest = new CreateTransactionRequestDTO(50.0, "CARS", 1L);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/2")
+						.content(objectMapper.writeValueAsString(transactionSecondRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(2))
+				.andExpect(jsonPath("$.amount").value(50))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").value(1))
+				.andReturn();
+
+		// When - Then
+		mockMvc.perform(MockMvcRequestBuilders.get("/transactions/sum/1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.sum").value(150))
+				.andReturn();
+
+	}
+
+
+	@Test
+	@DirtiesContext
+	public void testCreateTransactionWithParentIDChange() throws Exception {
+		// Given Parent Transaction
+		CreateTransactionRequestDTO parentTransactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", null);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/1")
+						.content(objectMapper.writeValueAsString(parentTransactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").isEmpty())
+				.andReturn();
+
+		// Given Child
+		CreateTransactionRequestDTO transactionRequest = new CreateTransactionRequestDTO(100.0, "CARS", 1L);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/2")
+						.content(objectMapper.writeValueAsString(transactionRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(2))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andExpect(jsonPath("$.parent_id").value(1))
+				.andReturn();
+
+		// Given Child update
+		CreateTransactionRequestDTO transactionSecondRequest = new CreateTransactionRequestDTO(100.0, "CARS", null);
+
+		mockMvc.perform(MockMvcRequestBuilders.put("/transactions/2")
+						.content(objectMapper.writeValueAsString(transactionSecondRequest))
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(2))
+				.andExpect(jsonPath("$.amount").value(100))
+				.andExpect(jsonPath("$.type").value("CARS"))
+				.andReturn();
+
+		// When - Then
+		mockMvc.perform(MockMvcRequestBuilders.get("/transactions/sum/1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.sum").value(100))
+				.andReturn();
+
+	}
+
 
 }

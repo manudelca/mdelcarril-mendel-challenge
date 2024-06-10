@@ -1,10 +1,12 @@
 package com.mendel.challenge.service;
 
+import com.mendel.challenge.dto.controller.UpdateTransactionSumRequestDTO;
 import com.mendel.challenge.dto.service.TransactionDTO;
 import com.mendel.challenge.dto.service.exception.ParentTransactionIdEqualsTransactionIdException;
 import com.mendel.challenge.dto.service.exception.ParentTransactionNotFoundException;
 import com.mendel.challenge.model.Transaction;
 import com.mendel.challenge.model.enums.TransactionType;
+import com.mendel.challenge.repository.TransactionQueue;
 import com.mendel.challenge.repository.TransactionRepository;
 import com.mendel.challenge.util.PagedResultsDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -25,6 +27,9 @@ public class TransactionServiceImplTest {
 
     @Mock
     private TransactionRepository transactionRepository;
+
+    @Mock
+    private TransactionQueue transactionQueue;
 
     @InjectMocks
     private TransactionServiceImpl transactionService;
@@ -68,6 +73,7 @@ public class TransactionServiceImplTest {
 
         // Then
         assertEquals(transactionRequest, result);
+        Mockito.verify(transactionQueue, Mockito.times(1)).PublishUpdateTransaction(Mockito.any());
     }
 
     @Test
