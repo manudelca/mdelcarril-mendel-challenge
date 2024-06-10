@@ -17,6 +17,8 @@ public class TransactionConsumerController {
         this.transactionService = transactionService;
     }
 
+    // Este endpoint viene a representar la implementacion de un Consumer. Por cuestiones de simplicidad, se hizo como
+    // endpoint sincrónico, pero la idea es que esté escuchando una queue de mensajes.
     @PostMapping("/consumer/transactions/updates/sum")
     public void UpdateTransactionSum(@RequestBody UpdateTransactionSumRequestDTO request) {
         this.transactionService.UpdateTransactionSum(request.getId(), request.getSumDiff());
