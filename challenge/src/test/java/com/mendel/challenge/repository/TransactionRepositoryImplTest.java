@@ -75,6 +75,58 @@ public class TransactionRepositoryImplTest {
         assertEquals(transaction, transactionRepository.GetTransaction(1L));
     }
 
+    @Test
+    public void testGetTransactionSum() {
+        // Given
+        Transaction transaction = new Transaction(
+                1L,
+                10.0,
+                TransactionType.CARS,
+                null);
+        transactionRepository.SaveTransaction(transaction);
+
+        // When
+        Double sum = transactionRepository.GetTransactionSum(1L);
+
+        // Then
+        assertEquals(10, sum);
+    }
+
+
+    @Test
+    public void testAddTransactionSumPositiveNumber() {
+        // Given
+        Transaction transaction = new Transaction(
+                1L,
+                10.0,
+                TransactionType.CARS,
+                null);
+        transactionRepository.SaveTransaction(transaction);
+
+        // When
+        transactionRepository.AddTransactionSum(1L, 5.0);
+
+        // Then
+        assertEquals(15, transactionRepository.GetTransactionSum(1L));
+    }
+
+    @Test
+    public void testAddTransactionSumNegativeNumber() {
+        // Given
+        Transaction transaction = new Transaction(
+                1L,
+                10.0,
+                TransactionType.CARS,
+                null);
+        transactionRepository.SaveTransaction(transaction);
+
+        // When
+        transactionRepository.AddTransactionSum(1L, -5.0);
+
+        // Then
+        assertEquals(5, transactionRepository.GetTransactionSum(1L));
+    }
+
 
     @Test
     public void

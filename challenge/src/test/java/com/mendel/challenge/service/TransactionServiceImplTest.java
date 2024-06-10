@@ -4,6 +4,7 @@ import com.mendel.challenge.dto.controller.UpdateTransactionSumRequestDTO;
 import com.mendel.challenge.dto.service.TransactionDTO;
 import com.mendel.challenge.dto.service.exception.ParentTransactionIdEqualsTransactionIdException;
 import com.mendel.challenge.dto.service.exception.ParentTransactionNotFoundException;
+import com.mendel.challenge.dto.service.exception.TransactionNotFoundException;
 import com.mendel.challenge.model.Transaction;
 import com.mendel.challenge.model.enums.TransactionType;
 import com.mendel.challenge.repository.TransactionQueue;
@@ -117,6 +118,57 @@ public class TransactionServiceImplTest {
         assertEquals(1, result.getResult().get(0));
         assertEquals(2, result.getResult().get(1));
         assertEquals(3, result.getResult().get(2));
+    }
+
+
+    @Test
+    void testUpdateTransactionSumNoParentID() {
+        // Given
+        Mockito.when(transactionRepository.GetTransaction(Mockito.eq(1L))).thenReturn(new Transaction(1L, 100.0, TransactionType.CARS, null));
+
+        // When
+        transactionService.UpdateTransactionSum(1L, 10.0);
+
+        // Then
+        Mockito.verify(transactionQueue, Mockito.times(0)).PublishUpdateTransaction(Mockito.any());
+        Mockito.verify(transactionRepository, Mockito.times(1)).AddTransactionSum(Mockito.eq(1L), Mockito.eq(10.0));
+    }
+
+    @Test
+    void testUpdateTransactionSumWithParentID() {
+        // Given
+        Mockito.when(transactionRepository.GetTransaction(Mockito.eq(1L))).thenReturn(new Transaction(1L, 100.0, TransactionType.CARS, 2L));
+
+        // When
+        transactionService.UpdateTransactionSum(1L, 10.0);
+
+        // Then
+        Mockito.verify(transactionQueue, Mockito.times(1)).PublishUpdateTransaction(Mockito.any());
+        Mockito.verify(transactionRepository, Mockito.times(1)).AddTransactionSum(Mockito.eq(1L), Mockito.eq(10.0));
+    }
+
+    @Test
+    void testGetTransactionSumNotFound(){
+        // Given
+        Mockito.when(transactionRepository.GetTransaction(Mockito.eq(1L))).thenReturn(null);
+
+        // Then
+        assertThrows(TransactionNotFoundException.class, () -> {
+            // When
+            transactionService.GetTransactionSum(1L);
+        });
+    }
+
+    @Test
+    void testGetTransactionSumSuccess(){
+        // Given
+        Mockito.when(transactionRepository.GetTransaction(Mockito.eq(1L))).thenReturn(new Transaction(1L, 100.0, TransactionType.CARS, 2L));
+        Mockito.when(transactionRepository.GetTransactionSum(Mockito.eq(1L))).thenReturn(10.0);
+
+        // When
+        Double sum = transactionService.GetTransactionSum(1L);
+
+        assertEquals(10.0, sum);
     }
 
 }

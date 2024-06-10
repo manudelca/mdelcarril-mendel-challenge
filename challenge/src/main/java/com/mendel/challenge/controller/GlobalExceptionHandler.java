@@ -2,6 +2,7 @@ package com.mendel.challenge.controller;
 import com.mendel.challenge.dto.controller.ErrorResponseDTO;
 import com.mendel.challenge.dto.service.exception.ParentTransactionIdEqualsTransactionIdException;
 import com.mendel.challenge.dto.service.exception.ParentTransactionNotFoundException;
+import com.mendel.challenge.dto.service.exception.TransactionNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,6 +68,15 @@ public class GlobalExceptionHandler {
         errors.add(ex.getMessage());
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         String message = "parent transaction not found";
+        return new ResponseEntity<>(new ErrorResponseDTO(httpStatus.value(), httpStatus.getReasonPhrase(), message, errors), httpStatus);
+    }
+
+    @ExceptionHandler({TransactionNotFoundException.class})
+    public ResponseEntity<ErrorResponseDTO> handleTransactionNotFoundException(TransactionNotFoundException ex) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ex.getMessage());
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        String message = "transaction not found";
         return new ResponseEntity<>(new ErrorResponseDTO(httpStatus.value(), httpStatus.getReasonPhrase(), message, errors), httpStatus);
     }
 

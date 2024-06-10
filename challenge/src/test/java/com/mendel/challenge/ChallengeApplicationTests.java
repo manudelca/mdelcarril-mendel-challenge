@@ -255,6 +255,15 @@ class ChallengeApplicationTests {
 				.andReturn();
 	}
 
+	@Test
+	public void testGetTransactionSumNotFound() throws Exception {
+
+		// When - Then
+		mockMvc.perform(MockMvcRequestBuilders.get("/transactions/sum/1"))
+				.andExpect(status().isNotFound())
+				.andReturn();
+	}
+
 
 	@Test
 	@DirtiesContext
